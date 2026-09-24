@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RNA Modification Analysis | Joshua Wu</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #0a0d12;
+            color: #e8edf5;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1100px, 90%);
+            margin: auto;
+        }
+
+        /* NAVIGATION */
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 13, 18, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #1e2630;
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: auto;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .back {
+            color: #9da8b7;
+            font-size: 0.9rem;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        /* HERO */
+
+        .hero {
+            padding: 100px 0 70px;
+        }
+
+        .eyebrow {
+            color: #75a7ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            line-height: 1;
+            letter-spacing: -3px;
+            max-width: 950px;
+            margin-bottom: 28px;
+        }
+
+        .hero-description {
+            max-width: 780px;
+            color: #aeb8c7;
+            font-size: 1.2rem;
+        }
+
+        /* SECTIONS */
+
+        section {
+            padding: 80px 0;
+            border-top: 1px solid #1a212b;
+        }
+
+        .section-number {
+            color: #75a7ff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 2.3rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #aeb8c7;
+            max-width: 800px;
+            margin-bottom: 18px;
+        }
+
+        /* CARDS */
+
+        .cards {
+            margin-top: 35px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: #10151d;
+            border: 1px solid #242d38;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .card-label {
+            display: block;
+            color: #75a7ff;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        /* WORKFLOW */
+
+        .workflow {
+            margin-top: 35px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .workflow-step {
+            background: #10151d;
+            border: 1px solid #242d38;
+            padding: 20px 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #566274;
+        }
+
+        /* STATS */
+
+        .stats {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .stat {
+            padding: 28px;
+            border: 1px solid #242d38;
+            border-radius: 14px;
+            background: #10151d;
+        }
+
+        .stat-number {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #8995a5;
+            font-size: 0.9rem;
+        }
+
+        /* IMAGE */
+
+        .image-card {
+            margin-top: 35px;
+            background: #10151d;
+            border: 1px solid #242d38;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .image-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            padding: 15px 18px;
+            color: #8995a5;
+            font-size: 0.85rem;
+        }
+
+        /* ANALYSIS GRID */
+
+        .analysis-grid {
+            margin-top: 35px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .analysis-card {
+            background: #10151d;
+            border: 1px solid #242d38;
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .analysis-card h3 {
+            margin-bottom: 12px;
+        }
+
+        /* BUTTON */
+
+        .button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 18px;
+            border: 1px solid #394656;
+            border-radius: 9px;
+            color: #e8edf5;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .button:hover {
+            background: #171e27;
+            border-color: #617086;
+        }
+
+        /* NOTICE */
+
+        .notice {
+            margin-top: 30px;
+            padding: 20px;
+            border-left: 3px solid #75a7ff;
+            background: #10151d;
+            color: #929eae;
+            font-size: 0.9rem;
+        }
+
+        /* FOOTER */
+
+        footer {
+            padding: 50px 0 70px;
+            text-align: center;
+            color: #697586;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .workflow {
+                grid-template-columns: 1fr;
+            }
+
+            .arrow {
+                display: none;
+            }
+
+            .cards,
+            .analysis-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+
+            .hero {
+                padding: 70px 0 50px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <div class="nav-inner">
+
+            <a href="../index.html" class="logo">
+                JW
+            </a>
+
+            <a href="../index.html" class="back">
+                ← Back to Portfolio
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+
+    <header class="hero">
+
+        <div class="container">
+
+            <div class="eyebrow">
+                Computational Biology · RNA · Nanopore Sequencing
+            </div>
+
+            <h1>
+                Mapping RNA modifications across skeletal muscle.
+            </h1>
+
+            <p class="hero-description">
+                A computational biology project using nanopore sequencing data
+                to investigate RNA modification patterns across mouse skeletal
+                muscle tissues and identify genes that may be relevant to
+                neuromuscular disease.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+
+        <!-- 01 PROJECT OVERVIEW -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    01 · PROJECT OVERVIEW
+                </div>
+
+                <h2>
+                    Using long-read sequencing to study RNA modifications.
+                </h2>
+
+                <p>
+                    This project examined RNA modification patterns in mouse
+                    skeletal muscle using nanopore sequencing. The analysis
+                    compared different muscle tissues to identify shared and
+                    tissue-associated modification sites.
+                </p>
+
+                <p>
+                    The broader goal was to understand how RNA modifications
+                    may relate to gene regulation and muscle biology, with
+                    particular attention to genes relevant to muscular
+                    dystrophy and facioscapulohumeral muscular dystrophy (FSHD).
+                </p>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <div class="stat-number">
+                            8,994
+                        </div>
+
+                        <div class="stat-label">
+                            Shared inosine-site genes
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <div class="stat-number">
+                            763
+                        </div>
+
+                        <div class="stat-label">
+                            Genes with ≥3 shared sites
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <div class="stat-number">
+                            4
+                        </div>
+
+                        <div class="stat-label">
+                            RNA modification classes examined
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 02 DATA -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    02 · DATA
+                </div>
+
+                <h2>
+                    Comparing RNA across muscle tissues.
+                </h2>
+
+                <p>
+                    Nanopore sequencing data were examined across mouse skeletal
+                    muscle samples representing different anatomical regions.
+                    The analysis included abdominal wall and pectoralis tissue
+                    as well as gastrocnemius samples.
+                </p>
+
+
+                <div class="cards">
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Trunk
+                        </span>
+
+                        <h3>
+                            Abdominal Wall
+                        </h3>
+
+                        <p>
+                            AbWall tissue was analyzed as one of the trunk
+                            muscle groups in the dataset.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Trunk
+                        </span>
+
+                        <h3>
+                            Pectoralis
+                        </h3>
+
+                        <p>
+                            Pectoralis tissue provided a second trunk muscle
+                            dataset for comparison.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Limb
+                        </span>
+
+                        <h3>
+                            Gastrocnemius
+                        </h3>
+
+                        <p>
+                            Gastrocnemius samples were used to represent
+                            limb-associated skeletal muscle.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 03 MODIFICATIONS -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    03 · RNA MODIFICATIONS
+                </div>
+
+                <h2>
+                    Looking across multiple RNA modification types.
+                </h2>
+
+                <p>
+                    The analysis examined several classes of RNA modifications
+                    detected in the nanopore sequencing data.
+                </p>
+
+
+                <div class="cards">
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Modification 01
+                        </span>
+
+                        <h3>
+                            Inosine
+                        </h3>
+
+                        <p>
+                            Inosine sites were analyzed across tissues to
+                            identify shared and tissue-associated patterns.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Modification 02
+                        </span>
+
+                        <h3>
+                            m6A
+                        </h3>
+
+                        <p>
+                            N6-methyladenosine sites were included as another
+                            modification class for comparison.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Modification 03
+                        </span>
+
+                        <h3>
+                            Ψ
+                        </h3>
+
+                        <p>
+                            Pseudouridine-associated modification calls were
+                            included in the analysis.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span class="card-label">
+                            Modification 04
+                        </span>
+
+                        <h3>
+                            m5C / Nm
+                        </h3>
+
+                        <p>
+                            Additional modification classes including m5C
+                            and Nm were examined across the dataset.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 04 WORKFLOW -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    04 · ANALYSIS WORKFLOW
+                </div>
+
+                <h2>
+                    From sequencing data to biological interpretation.
+                </h2>
+
+                <p>
+                    The project combined visualization, quantitative analysis,
+                    and dimensionality reduction to investigate modification
+                    patterns across samples.
+                </p>
+
+
+                <div class="workflow">
+
+                    <div class="workflow-step">
+                        Nanopore
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        Modification Calls
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        IGV
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        Jupyter
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        PCA
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        Gene Analysis
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                    <div class="workflow-step">
+                        Disease Relevance
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 05 COMPUTATIONAL ANALYSIS -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    05 · COMPUTATIONAL ANALYSIS
+                </div>
+
+                <h2>
+                    Visualizing and comparing modification patterns.
+                </h2>
+
+                <p>
+                    IGV was used to inspect modification sites within genomic
+                    regions, while Jupyter-based analysis was used to organize
+                    and compare the resulting data. Principal component analysis
+                    was used to examine patterns across samples.
+                </p>
+
+
+                <div class="analysis-grid">
+
+                    <div class="analysis-card">
+
+                        <h3>
+                            IGV
+                        </h3>
+
+                        <p>
+                            Inspected RNA modification calls at individual
+                            genomic locations and examined their distribution
+                            across samples.
+                        </p>
+
+                    </div>
+
+
+                    <div class="analysis-card">
+
+                        <h3>
+                            Jupyter / Python
+                        </h3>
+
+                        <p>
+                            Used computational notebooks to organize modification
+                            data, compare samples, and identify shared patterns.
+                        </p>
+
+                    </div>
+
+
+                    <div class="analysis-card">
+
+                        <h3>
+                            PCA
+                        </h3>
+
+                        <p>
+                            Principal component analysis was used to visualize
+                            relationships between samples based on modification
+                            patterns.
+                        </p>
+
+                    </div>
+
+
+                    <div class="analysis-card">
+
+                        <h3>
+                            Gene-Level Analysis
+                        </h3>
+
+                        <p>
+                            Shared modification sites were mapped toward gene-level
+                            interpretation and potential relevance to muscle disease.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 06 KEY RESULT -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    06 · KEY RESULT
+                </div>
+
+                <h2>
+                    Narrowing thousands of sites toward biologically relevant genes.
+                </h2>
+
+                <p>
+                    Across the datasets, 8,994 genes were associated with shared
+                    inosine sites. Applying a more stringent requirement of at
+                    least three shared sites reduced this set to 763 genes.
+                </p>
+
+                <p>
+                    This filtering step helped narrow the analysis toward genes
+                    with repeated modification patterns that could be investigated
+                    further in the context of skeletal muscle biology.
+                </p>
+
+
+                <div class="notice">
+
+                    The analysis ultimately focused on CKM as a candidate gene
+                    of interest because of its relevance to skeletal muscle
+                    function and its potential connection to muscular disease
+                    research.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 07 BIOLOGICAL SIGNIFICANCE -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    07 · BIOLOGICAL SIGNIFICANCE
+                </div>
+
+                <h2>
+                    Connecting RNA regulation to muscle disease.
+                </h2>
+
+                <p>
+                    RNA modifications provide another layer through which cells
+                    can regulate RNA behavior and gene expression. Studying these
+                    modifications in skeletal muscle may help identify molecular
+                    patterns associated with muscle-specific biology.
+                </p>
+
+                <p>
+                    The project used computational analysis to move from raw
+                    sequencing-derived modification calls toward candidate genes
+                    that could be investigated in future studies of muscular
+                    dystrophy and FSHD.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 08 POSTER -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    08 · PRESENTATION
+                </div>
+
+                <h2>
+                    Communicating the analysis.
+                </h2>
+
+                <p>
+                    The project was presented as a scientific poster summarizing
+                    the sequencing data, computational workflow, modification
+                    analysis, and biological interpretation.
+                </p>
+
+
+                <a
+                    class="button"
+                    href="https://joshuatwu.github.io/Copy%20of%20Micropipettes%20Poster%20Presentation%20(1).pdf"
+                    target="_blank"
+                >
+                    View COSMOS Poster →
+                </a>
+
+
+                <div class="notice">
+
+                    This project was completed through the COSMOS program at
+                    UC Irvine and involved collaboration with Rebecca, Neeti,
+                    and Aubrey.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 09 MY ROLE -->
+
+        <section>
+
+            <div class="container">
+
+                <div class="section-number">
+                    09 · MY ROLE
+                </div>
+
+                <h2>
+                    Computational analysis and biological interpretation.
+                </h2>
+
+                <p>
+                    My work involved analyzing nanopore-derived RNA modification
+                    data, visualizing modification sites in IGV, working with
+                    Jupyter-based analysis, examining sample relationships using
+                    PCA, and helping connect computational findings to questions
+                    in muscle biology and disease.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <footer>
+
+        <div class="container">
+
+            <p>
+                Joshua Wu · UCLA Bioengineering
+            </p>
+
+            <a href="../index.html" class="back">
+                ← Return to portfolio
+            </a>
+
+        </div>
+
+    </footer>
+
+
+</body>
+</html>
